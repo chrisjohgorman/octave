@@ -5,7 +5,7 @@
 
 pkgname=octave
 pkgver=8.3.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A high-level language, primarily intended for numerical computations"
 arch=('x86_64')
 url="https://www.gnu.org/software/octave/"
@@ -55,6 +55,10 @@ sha512sums=('cafdf4d04c34914a945a0bc3d68b63f91402bb0c43b7c545fb7b2fd23906f516f21
 build() {
   cd "$pkgname-$pkgver"
 
+  # suppress warning message below:
+  # egrep: warning: egrep is obsolescent; using grep -E
+  export EGREP="grep -E"
+
   ./configure \
     --prefix=/usr \
     --libexecdir=/usr/lib \
@@ -73,4 +77,12 @@ package(){
   # add octave library path to ld.so.conf.d
   install -d "$pkgdir/etc/ld.so.conf.d"
   echo "/usr/lib/$pkgname/$pkgver" > "$pkgdir/etc/ld.so.conf.d/$pkgname.conf"
+
+  # dirty hack to make package reproducible
+  local ARCHIVE_DATE="$(TZ=UTC date --reference=ChangeLog --iso-8601=seconds)"
+  mkdir tmpdir
+  cd tmpdir
+  jar --extract --file="$pkgdir/usr/share/octave/$pkgver/m/java/octave.jar"
+  rm -rf "$pkgdir/usr/share/octave/$pkgver/m/java/octave.jar"
+  jar --create --date="$ARCHIVE_DATE" --file="$pkgdir/usr/share/octave/$pkgver/m/java/octave.jar" ./*
 }
