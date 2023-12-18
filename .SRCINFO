@@ -1,7 +1,7 @@
 pkgbase = octave
 	pkgdesc = A high-level language, primarily intended for numerical computations
 	pkgver = 8.4.0
-	pkgrel = 1
+	pkgrel = 2
 	url = https://www.gnu.org/software/octave/
 	arch = x86_64
 	license = GPL
