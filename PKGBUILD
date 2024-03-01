@@ -5,7 +5,7 @@
 
 pkgname=octave
 pkgver=8.4.0
-pkgrel=2
+pkgrel=3
 pkgdesc='A high-level language, primarily intended for numerical computations'
 arch=('x86_64')
 url='https://www.gnu.org/software/octave/'
@@ -46,11 +46,19 @@ optdepends=(
   'fltk: FLTK GUI'
   'texlive-bin: for the publish command'
 )
-source=("https://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.gz"{,.sig})
+source=("https://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.gz"{,.sig}
+         sundials-7.patch)
 options=('!emptydirs')
 validpgpkeys=('DBD9C84E39FE1AAE99F04446B05F05B75D36644B')  # John W. Eaton
 sha512sums=('d9ebc965c7d4b88128c3cb17c039b224f13ac71542f016eb6811213d65426276013a84b35a6f8ceb84640af1970381b25dadacd521de2faea1696dceea9c99aa'
-            'SKIP')
+            'SKIP'
+            'f8409113ecb19b1c94d515fbb07cee789b2d792b02c3c12c9796fbaea705cd0472d9210f2e9fe02cc5e525be3f875a885f5de1819d4113c75f4ab25cd0a512f9')
+
+prepare() {
+  cd $pkgname-$pkgver
+  patch -p1 < ../sundials-7.patch
+  autoreconf -vif
+}
 
 build() {
   cd "$pkgname-$pkgver"
@@ -59,6 +67,8 @@ build() {
   # egrep: warning: egrep is obsolescent; using grep -E
   export EGREP="grep -E"
 
+  # Workaround build failure with sundials 7
+  LDFLAGS+=" -lsundials_core" \
   ./configure \
     --prefix=/usr \
     --libexecdir=/usr/lib \
@@ -66,6 +76,7 @@ build() {
     --disable-static \
     --with-quantum-depth=16
 
+  sed -i 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool # Fix overlinking
   make
 }
 
