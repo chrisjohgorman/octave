@@ -2,10 +2,11 @@
 # Contributor: Ronald van Haren <ronald.archlinux.org>
 # Contributor : shining <shiningxc.at.gmail.com>
 # Contributor : cyberdune <cyberdune@gmail.com>
+# Contributor : Chris Gorman <chrisjohgorman@gmail.com>
 
 pkgname=octave
-pkgver=8.4.0
-pkgrel=3
+pkgver=9.1.0
+pkgrel=1
 pkgdesc='A high-level language, primarily intended for numerical computations'
 arch=('x86_64')
 url='https://www.gnu.org/software/octave/'
@@ -17,20 +18,20 @@ depends=(
   'glpk'
   'hdf5'
   'qhull'
-  'arpack'
+  'arpack64'
   'glu'
   'ghostscript'
-  'sundials'
+  'sundials64'
   'gl2ps'
-  'qscintilla-qt5'
+  'qscintilla-qt6'
   'libsndfile'
-  'qt5-tools'
-  'qrupdate'
+  'qt6-tools'
+  'qrupdate64'
   'pcre2'
 )
 makedepends=(
   'gcc-fortran'
-  'suitesparse'
+  'suitesparse64'
   'texinfo'
   'gnuplot'
   'fltk'
@@ -50,15 +51,9 @@ source=("https://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.gz"{,.sig}
          sundials-7.patch)
 options=('!emptydirs')
 validpgpkeys=('DBD9C84E39FE1AAE99F04446B05F05B75D36644B')  # John W. Eaton
-sha512sums=('d9ebc965c7d4b88128c3cb17c039b224f13ac71542f016eb6811213d65426276013a84b35a6f8ceb84640af1970381b25dadacd521de2faea1696dceea9c99aa'
+sha512sums=('1b4370ce0970ce360c91b054b79d9b0dd00715a2384bf7aefd2b4e851cbea836c7bfe4d801543056070d1d4ccb2f3ce85118959568df76a6bff2694ea50a3ba8'
             'SKIP'
             'f8409113ecb19b1c94d515fbb07cee789b2d792b02c3c12c9796fbaea705cd0472d9210f2e9fe02cc5e525be3f875a885f5de1819d4113c75f4ab25cd0a512f9')
-
-prepare() {
-  cd $pkgname-$pkgver
-  patch -p1 < ../sundials-7.patch
-  autoreconf -vif
-}
 
 build() {
   cd "$pkgname-$pkgver"
@@ -67,17 +62,39 @@ build() {
   # egrep: warning: egrep is obsolescent; using grep -E
   export EGREP="grep -E"
 
-  # Workaround build failure with sundials 7
-  LDFLAGS+=" -lsundials_core" \
+  JAVA_HOME=/usr/lib/jvm/default \
   ./configure \
+    --enable-64 \
+    --with-blas=/usr/lib/libblas64.so \
+    --with-lapack=/usr/lib/liblapack64.so \
     --prefix=/usr \
     --libexecdir=/usr/lib \
     --enable-shared \
     --disable-static \
-    --with-quantum-depth=16
+    --with-amd-includedir=/usr/include/suitesparse64 \
+    --with-amd=-lamd64 \
+    --with-arpack-includedir=/usr/include/arpack64 \
+    --with-arpack=-larpack64 \
+    --with-camd-includedir=/usr/include/suitesparse64 \
+    --with-camd=-lcamd64 \
+    --with-ccolamd-includedir=/usr/include/suitesparse64 \
+    --with-ccolamd=-lccolamd64 \
+    --with-cholmod-includedir=/usr/include/suitesparse64 \
+    --with-cholmod=-lcholmod64 \
+    --with-colamd-includedir=/usr/include/suitesparse64 \
+    --with-colamd=-lcolamd64 \
+    --with-cxsparse-includedir=/usr/include/suitesparse64 \
+    --with-cxsparse=-lcxsparse64 \
+    --with-qrupdate-includedir=/usr/include/openblas64 \
+    --with-qrupdate="-lqrupdate64 -lopenblas_64" \
+    --with-spqr-includedir=/usr/include/suitesparse64 \
+    --with-spqr=-lspqr64 \
+    --with-suitesparseconfig=-lsuitesparseconfig64 \
+    --with-umfpack-includedir=/usr/include/suitesparse64 \
+    --with-umfpack=-lumfpack64
 
   sed -i 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool # Fix overlinking
-  make
+  make -j6
 }
 
 package(){
