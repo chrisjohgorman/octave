@@ -1,4 +1,4 @@
-pkgbase = octave
+pkgbase = octave64
 	pkgdesc = A high-level language, primarily intended for numerical computations
 	pkgver = 9.1.0
 	pkgrel = 1
@@ -35,13 +35,17 @@ pkgbase = octave
 	optdepends = java-runtime: java support
 	optdepends = fltk: FLTK GUI
 	optdepends = texlive-bin: for the publish command
+	provides = octave
+	conflicts = octave
 	options = !emptydirs
 	source = https://ftp.gnu.org/gnu/octave/octave-9.1.0.tar.gz
 	source = https://ftp.gnu.org/gnu/octave/octave-9.1.0.tar.gz.sig
 	source = sundials-7.patch
+	source = bug65605-qt6-opengl-partial-update.patch
 	validpgpkeys = DBD9C84E39FE1AAE99F04446B05F05B75D36644B
 	sha512sums = 1b4370ce0970ce360c91b054b79d9b0dd00715a2384bf7aefd2b4e851cbea836c7bfe4d801543056070d1d4ccb2f3ce85118959568df76a6bff2694ea50a3ba8
 	sha512sums = SKIP
 	sha512sums = f8409113ecb19b1c94d515fbb07cee789b2d792b02c3c12c9796fbaea705cd0472d9210f2e9fe02cc5e525be3f875a885f5de1819d4113c75f4ab25cd0a512f9
+	sha512sums = 64b986571e4bdd25f242f2f06c9698729dd86dad832ce8eda5e64f889690cd9219fb55fb36ddfcad157aa9b131fe57b2d9fc624ad30c6257ab96361e8d57fb8d
 
-pkgname = octave
+pkgname = octave64
