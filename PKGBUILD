@@ -4,7 +4,8 @@
 # Contributor : cyberdune <cyberdune@gmail.com>
 # Contributor : Chris Gorman <chrisjohgorman@gmail.com>
 
-pkgname=octave
+pkgname=octave64
+_pkgname=octave
 pkgver=9.1.0
 pkgrel=1
 pkgdesc='A high-level language, primarily intended for numerical computations'
@@ -47,6 +48,8 @@ optdepends=(
   'fltk: FLTK GUI'
   'texlive-bin: for the publish command'
 )
+provides=(octave)
+conflicts=(octave)
 source=("https://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.gz"{,.sig}
          sundials-7.patch
          bug65605-qt6-opengl-partial-update.patch)
@@ -58,17 +61,12 @@ sha512sums=('1b4370ce0970ce360c91b054b79d9b0dd00715a2384bf7aefd2b4e851cbea836c7b
             '64b986571e4bdd25f242f2f06c9698729dd86dad832ce8eda5e64f889690cd9219fb55fb36ddfcad157aa9b131fe57b2d9fc624ad30c6257ab96361e8d57fb8d')
 
 prepare() {
-    cd $pkgname-$pkgver
+    cd $_pkgname-$pkgver
     patch -p1 < ../bug65605-qt6-opengl-partial-update.patch
-    autoreconf -vif
 }
 
 build() {
-  cd "$pkgname-$pkgver"
-
-  # suppress warning message below:
-  # egrep: warning: egrep is obsolescent; using grep -E
-  export EGREP="grep -E"
+  cd "$_pkgname-$pkgver"
 
   JAVA_HOME=/usr/lib/jvm/default \
   ./configure \
@@ -101,18 +99,17 @@ build() {
     --with-umfpack-includedir=/usr/include/suitesparse64 \
     --with-umfpack=-lumfpack64
 
-  sed -i 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool # Fix overlinking
   make -j6
 }
 
 package(){
-  cd "$pkgname-$pkgver"
+  cd "$_pkgname-$pkgver"
 
   make DESTDIR="$pkgdir" install
 
   # add octave library path to ld.so.conf.d
   install -d "$pkgdir/etc/ld.so.conf.d"
-  echo "/usr/lib/$pkgname/$pkgver" > "$pkgdir/etc/ld.so.conf.d/$pkgname.conf"
+  echo "/usr/lib/$_pkgname/$pkgver" > "$pkgdir/etc/ld.so.conf.d/$_pkgname.conf"
 
   # dirty hack to make package reproducible
   local ARCHIVE_DATE="$(TZ=UTC date --reference=ChangeLog --iso-8601=seconds)"
