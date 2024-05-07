@@ -51,13 +51,11 @@ optdepends=(
 provides=(octave)
 conflicts=(octave)
 source=("https://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.gz"{,.sig}
-         sundials-7.patch
          bug65605-qt6-opengl-partial-update.patch)
 options=('!emptydirs')
 validpgpkeys=('DBD9C84E39FE1AAE99F04446B05F05B75D36644B')  # John W. Eaton
 sha512sums=('1b4370ce0970ce360c91b054b79d9b0dd00715a2384bf7aefd2b4e851cbea836c7bfe4d801543056070d1d4ccb2f3ce85118959568df76a6bff2694ea50a3ba8'
             'SKIP'
-            'f8409113ecb19b1c94d515fbb07cee789b2d792b02c3c12c9796fbaea705cd0472d9210f2e9fe02cc5e525be3f875a885f5de1819d4113c75f4ab25cd0a512f9'
             '64b986571e4bdd25f242f2f06c9698729dd86dad832ce8eda5e64f889690cd9219fb55fb36ddfcad157aa9b131fe57b2d9fc624ad30c6257ab96361e8d57fb8d')
 
 prepare() {
